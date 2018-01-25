@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>图片列表</title>
+</head>
+<body>
+    <center>
+        <table border="1">
+            <tr>
+                <th>序号</th>
+                <th>七牛图片</th>
+                <th>upai图片</th>
+            </tr>
+            {volist name="imgList['data']" id="v"}
+                <tr>
+                    <td>{$v.id}</td>
+                    <td><img src="{$qiniu_img.$v.img}" width="200" height="100"></td>
+                    <td><img src="{$upai_img.$v.img}" width="200" height="100"></td>
+                </tr>
+            {/volist}
+        </table>
+        <a href="/both/imgList?page={$imgList.current_page-1<1?1:$imgList.current_page-1}"><button>上一页</button></a>
+        <a href="/both/addImg"><button>继续添加</button></a>
+        <a href="/both/imgList?page={$imgList.current_page+1>$imgList.last_page?$imgList.last_page:$imgList.current_page+1}"><button>下一页</button></a>
+    </center>
+</body>
+</html>

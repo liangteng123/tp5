@@ -1,0 +1,164 @@
+create database contract_huixiaoer  DEFAULT CHARSET utf8 COLLATE utf8_general_ci;
+use contract_huixiaoer;
+create table contract(
+id int PRIMARY key auto_increment,
+contract_number varchar(64) not null DEFAULT '' comment '合同号',
+status tinyint not null DEFAULT 1 comment '1:未创建；2：待提交；3：未通过；4：正常；5：停用；6：失效',
+create_time int(10) unsigned not null DEFAULT 0,
+update_time int(10) unsigned not null DEFAULT 0,
+create_by int not null DEFAULT 0,
+update_by int not null DEFAULT 0
+)charset=utf8 engine=innodb comment '合同基础表';
+
+
+create table contract_info(
+id int PRIMARY key auto_increment,
+contract_id int not null DEFAULT 0 comment '合同表id',
+supplier_id int not null DEFAULT 0 comment '供应商id',
+supplier_name varchar(64) not null default '' comment '供应商名称',
+supplier_group varchar(64) not null default '' comment '供应商集团',
+supplier_sign_type tinyint not null default 1 comment '集团签约',
+sign_company varchar(64) not null default '' comment '签约公司名称',
+sign_mode_id int not null DEFAULT 1 comment '签约形式表对应id',
+sign_type_id int not null DEFAULT 1 comment '签约类型表对应id',
+sign_rank_id int not null DEFAULT 1 comment '签约等级表对应id',
+special_apply_value tinyint(3) not null DEFAULT  0 comment
+'是否为服务费特殊申请 0：否；1:需扣除税点；2：需扣服务费；4：部分消费无平台服务费；3：（1+2）；5：（1+4）；6：（2+4）；7：（1+2+4）',
+other_instructions VARCHAR(255) not null DEFAULT '' comment '其它扣减服务费事项或特殊说明',
+age_limit SMALLINT not null DEFAULT 12 comment '合同年限 存储单位为月',
+effective_date date not null DEFAULT '0000-00-00'  COMMENT '合同生效日',
+is_automatic_renewal  tinyint(3) not null DEFAULT  0 comment '是否为自动展期 0：否；1：是',
+sign_authorizer VARCHAR(20) not null DEFAULT '' comment '签约授权人',
+Landline_number  VARCHAR(64) not null DEFAULT '' comment '座机号码',
+mobile  VARCHAR(64) not null DEFAULT '' comment '手机号码',
+payment_date date not null DEFAULT '0000-00-00'  COMMENT '合同付款日',
+overdue_day SMALLINT not null DEFAULT 1 comment '逾期时间限制',
+fine_proportion   int not null DEFAULT 1 comment '逾期罚款比例 例如15表示0.015%',
+is_deleted tinyint(1) not null DEFAULT 0 comment '是否删除 0：未删除；1已删除',
+create_time int(10) unsigned not null DEFAULT 0,
+update_time int(10) unsigned not null DEFAULT 0,
+create_by int not null DEFAULT 0,
+update_by int not null DEFAULT 0,
+index adx_contract_number(contract_number)
+)charset=utf8 engine=innodb comment '合同合约信息表';
+
+create table contract_item(
+id int PRIMARY key auto_increment,
+contract_id int not null DEFAULT 0 comment '合同表id',
+item_name  VARCHAR(32) not null DEFAULT '' comment '含服务费项名称',
+fee_proportion tinyint(3) not null DEFAULT 8 comment '平台服务费比例，比如800代表8%',
+tax_point smallint not null DEFAULT 0 comment '扣除税点，例如15表示0.015%',
+deduct_expenses int not null DEFAULT 0 comment '扣服务费',
+is_deleted tinyint(1) not null DEFAULT 0 comment '是否删除 0：未删除；1已删除',
+create_time int(10) unsigned not null DEFAULT 0,
+update_time int(10) unsigned not null DEFAULT 0,
+create_by int not null DEFAULT 0,
+update_by int not null DEFAULT 0
+)charset=utf8 engine=innodb comment '合同含服务费项对应表';
+
+create table sign_mode(
+id int PRIMARY key auto_increment,
+value VARCHAR(64) not null DEFAULT '' comment 'id对应值',
+is_deleted tinyint(1) not null DEFAULT 0 comment '是否删除 0：未删除；1已删除',
+create_time int(10) unsigned not null DEFAULT 0,
+update_time int(10) unsigned not null DEFAULT 0,
+create_by int not null DEFAULT 0,
+update_by int not null DEFAULT 0
+)charset=utf8 engine=innodb comment '签约形式对应关系表';
+
+create table sign_type(
+id int PRIMARY key auto_increment,
+value VARCHAR(64) not null DEFAULT '' comment 'id对应值',
+is_deleted tinyint(1) not null DEFAULT 0 comment '是否删除 0：未删除；1已删除',
+create_time int(10) unsigned not null DEFAULT 0,
+update_time int(10) unsigned not null DEFAULT 0,
+create_by int not null DEFAULT 0,
+update_by int not null DEFAULT 0
+)charset=utf8 engine=innodb comment '签约类型对应关系表';
+
+create table sign_rank(
+id int PRIMARY key auto_increment,
+value VARCHAR(64) not null DEFAULT '' comment 'id对应值',
+rank_score smallint not null DEFAULT 0 comment '服务费比例 例如15表示0.015%',
+is_deleted tinyint(1) not null DEFAULT 0 comment '是否删除 0：未删除；1已删除',
+create_time int(10) unsigned not null DEFAULT 0,
+update_time int(10) unsigned not null DEFAULT 0,
+create_by int not null DEFAULT 0,
+update_by int not null DEFAULT 0
+)charset=utf8 engine=innodb comment '签约等级对应关系表';
+
+create table contract_file(
+id int PRIMARY key auto_increment,
+contract_id int not null DEFAULT 0 comment '合同表id',
+file_path varchar(255) not null DEFAULT '' comment '合同文件上传地址',
+is_deleted tinyint(1) not null DEFAULT 0 comment '是否删除 0：未删除；1已删除',
+create_time int(10) unsigned not null DEFAULT 0,
+update_time int(10) unsigned not null DEFAULT 0,
+create_by int not null DEFAULT 0,
+update_by int not null DEFAULT 0
+)charset=utf8 engine=innodb comment '合同上传文件对应表';
+
+create table contract_invoice(
+id int PRIMARY key auto_increment,
+contract_id int not null DEFAULT 0 comment '合同表id',
+invoice_type tinyint(1) not null DEFAULT 1 comment '发票类型1：增值税专票；2：增值税普票；3：不要发票',
+rise_company VARCHAR(128) not null DEFAULT '' comment '发票抬头',
+invoice_item  tinyint not null DEFAULT 1 comment '开票项目 1：会议服务费；2：技术服务费；3：服务费；4：会议费',
+identification_number VARCHAR(128) not null DEFAULT '' comment '纳税人识别号',
+registration_address VARCHAR(255) not null DEFAULT '' comment '税务登记地址',
+registration_phone VARCHAR(30) not null DEFAULT '' comment '登记电话',
+taxpayer_rights tinyint(1) not null DEFAULT 1 comment '纳税人资格 1:一般纳税人',
+registration_bank VARCHAR(128) not null DEFAULT '' comment '税务登记开户行名称',
+registration_bank_number VARCHAR(128) not null DEFAULT '' comment '税务登记开户行',
+mailing_address VARCHAR(255) not null DEFAULT '' comment '邮寄地址',
+postal_code   VARCHAR(30) not null DEFAULT '' comment '邮政编码',
+is_deleted tinyint(1) not null DEFAULT 0 comment '是否删除 0：未删除；1已删除',
+create_time int(10) unsigned not null DEFAULT 0,
+update_time int(10) unsigned not null DEFAULT 0,
+create_by int not null DEFAULT 0,
+update_by int not null DEFAULT 0
+)charset=utf8 engine=innodb comment '合同发票对应表';
+
+
+
+create table contract_receivable(
+id int PRIMARY key auto_increment,
+contract_id int not null DEFAULT 0 comment '合同表id',
+reconciliation_model   tinyint(1) not null DEFAULT 1 comment '对账模式 1:统一月结模式；2：多人月结模式；3：单结模式',
+reconciliation_day tinyint(2) not null DEFAULT 1 comment '对账日',
+pay_day tinyint(2) not null DEFAULT 1 comment '付款日',
+pay_mode tinyint(1) not null DEFAULT 1 comment '支付模式 1：对公付款；2：个人付款',
+is_deleted tinyint(1) not null DEFAULT 0 comment '是否删除 0：未删除；1已删除',
+create_time int(10) unsigned not null DEFAULT 0,
+update_time int(10) unsigned not null DEFAULT 0,
+create_by int not null DEFAULT 0,
+update_by int not null DEFAULT 0
+)charset=utf8 engine=innodb comment '合同应收对应表';
+
+create table contract_receivable_extends(
+id int PRIMARY key auto_increment,
+contract_receivable_id int not null DEFAULT 0 comment '合同号',
+reconciliation_id int not null DEFAULT 0 comment '对账人id',
+position VARCHAR(32) not null DEFAULT '' comment '职位',
+mobile    VARCHAR(64) not null DEFAULT '' comment '手机号码',
+is_deleted tinyint(1) not null DEFAULT 0 comment '是否删除 0：未删除；1已删除',
+create_time int(10) unsigned not null DEFAULT 0,
+update_time int(10) unsigned not null DEFAULT 0,
+create_by int not null DEFAULT 0,
+update_by int not null DEFAULT 0
+)charset=utf8 engine=innodb comment '合同应收对应表扩展对账人表';
+
+create table supplier(
+id int PRIMARY key auto_increment,
+supplier_number varchar(32) not null default '' comment '供应商编号',
+supplier_type char(1) not null DEFAULT 'H' comment 'H：酒店L：搭建P：摄影C：摄像G：礼品E：策划T：旅行社V：用车',
+hotel_type  tinyint(2) not null DEFAULT 1 comment '1.国际连锁酒店2.内资酒店3.特色场地',
+supplier_name  varchar(64) not null default '' comment '供应商名称',
+city_code      int not null default 0 comment '城市代码',
+hotel_id  int not null DEFAULT 0,
+is_deleted tinyint(1) not null DEFAULT 0 comment '是否删除 0：未删除；1已删除',
+create_time int(10) unsigned not null DEFAULT 0,
+update_time int(10) unsigned not null DEFAULT 0,
+create_by int not null DEFAULT 0,
+update_by int not null DEFAULT 0
+)charset=utf8 engine=innodb comment '供应商基础信息表';
